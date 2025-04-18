@@ -1,7 +1,4 @@
-//import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
-
 import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
-
 
 @Entity('event')
 export class Event {
@@ -55,4 +52,7 @@ export class Event {
 
   @Column()
   idNumber: string;
+
+  @Column({ default: ' ' }) // optional: helps avoid null values
+  status: string;
 }

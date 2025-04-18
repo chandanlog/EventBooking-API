@@ -8,7 +8,7 @@ export class EventFormController {
 
   @Post()
   async submitForm(@Body() formDto: CreateEventFormDto) {
-    return this.eventFormService.create(formDto);
+    return this.eventFormService.createOrUpdateEvent(formDto);
   }
 
   @Get()
