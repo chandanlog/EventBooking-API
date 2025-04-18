@@ -8,6 +8,10 @@ import {
 export class CreateEventFormDto {
   @IsString()
   @IsNotEmpty()
+  userEmail: string;
+
+  @IsString()
+  @IsNotEmpty()
   userType: string;
 
   @IsString()
@@ -64,4 +68,5 @@ export class CreateEventFormDto {
   @IsString()
   @IsNotEmpty()
   idNumber: string;
+
 }
