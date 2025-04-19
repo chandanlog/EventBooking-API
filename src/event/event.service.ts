@@ -39,4 +39,30 @@ export class EventFormService {
   async findAll(): Promise<Event[]> {
     return this.eventRepository.find();
   }
+
+    // ✅ New function to upload documents and update status
+    async uploadDocuments(
+      userEmail: string,
+      eventId: number,
+      userType: string,
+      idProof?: Buffer,
+      orgRequestLetter?: Buffer,
+    ): Promise<Event | null> {
+      const existingEvent = await this.eventRepository.findOne({
+        where: { userEmail, eventId, userType },
+      });
+  
+      if (!existingEvent) {
+        return null;
+      }
+  
+      // Update fields if provided
+      if (idProof) existingEvent.idProof = idProof;
+      if (orgRequestLetter) existingEvent.orgRequestLetter = orgRequestLetter;
+  
+      // Set status to upload document
+      existingEvent.status = 'upload document';
+  
+      return this.eventRepository.save(existingEvent);
+    }
 }
