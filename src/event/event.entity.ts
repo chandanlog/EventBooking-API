@@ -56,9 +56,9 @@ export class Event {
   @Column({ default: ' ' }) // optional: helps avoid null values
   status: string;
 
-  @Column({ type: 'longblob' }) // Use 'blob' or 'longblob' for larger files
+ @Column({ type: 'longblob', nullable: true })
   idProof: Buffer;
-
+  
   @Column({ type: 'longblob', nullable: true })
   orgRequestLetter?: Buffer;
 
