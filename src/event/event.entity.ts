@@ -58,7 +58,7 @@ export class Event {
 
   @Column({ default: ' ' }) // optional: helps avoid null values
   status: string;
-
+ 
   @Column({ type: 'longblob', nullable: true })
   idProof: Buffer;
   
