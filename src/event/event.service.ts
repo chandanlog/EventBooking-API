@@ -101,18 +101,50 @@ export class EventFormService {
   
     async findAllSubmittedOrApprovedEventsByEmail(userEmail: string): Promise<any> {
       const query = `
-        SELECT event.userType,event.eventName,event.eventLoaction,event.eventDate,event.numSeats,event.eventId,event.status,event.ticketNo, member.*
+        SELECT 
+          event.userType, 
+          event.eventName, 
+          event.eventLoaction, 
+          event.eventDate, 
+          event.numSeats, 
+          event.eventId, 
+          event.status, 
+          event.ticketNo, 
+          member.*
         FROM event
-        JOIN member ON member.userEmail = event.userEmail AND member.eventId = event.eventId
-        WHERE event.userEmail = 'test@gmail.com'
-          AND (
-            (event.userType = 'individual' AND event.status = 'submitted')
-            OR
-            (event.userType = 'organization' AND event.status = 'approve')
-          );
+        JOIN member 
+          ON member.userEmail = event.userEmail 
+          AND member.eventId = event.eventId
+        WHERE event.userEmail = ?
+        ORDER BY event.eventDate DESC
       `;
     
-      const result = await this.eventRepository.query(query, [userEmail]);
-      return result;
-    }    
+      const allEvents = await this.eventRepository.query(query, [userEmail]);
+    
+      // Check if any organization event is still in submitted state
+      const orgPending = allEvents.find(
+        (e) => e.userType === 'organization' && e.status === 'submitted'
+      );
+    
+      // If organization event is pending approval, include message in the response
+      if (orgPending) {
+        const response = [
+          { message: 'Wait for admin approval for your organization submission.' },
+          ...allEvents.filter(
+            (e) =>
+              !(e.userType === 'organization' && e.status === 'submitted')
+          ),
+        ];
+        return response;  // Return a single array including the message and approved events
+      }
+    
+      // Otherwise, return valid submitted/approved events
+      return allEvents.filter(
+        (e) =>
+          (e.userType === 'individual' && e.status === 'submitted') ||
+          (e.userType === 'organization' && e.status === 'approve')
+      );
+    }
+    
+    
 }
