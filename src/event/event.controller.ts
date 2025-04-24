@@ -1,7 +1,7 @@
-import { Body, Controller, Get, Post, UploadedFiles, UseInterceptors,} from '@nestjs/common';
+import { Body, Controller, Get, Post, UploadedFiles, UseInterceptors} from '@nestjs/common';
 import { EventFormService } from './event.service';
 import { CreateEventFormDto } from './create-event.dto';
-import { FileFieldsInterceptor } from '@nestjs/platform-express';
+import { FileFieldsInterceptor,AnyFilesInterceptor } from '@nestjs/platform-express';
 import { Express } from 'express';
 
 @Controller('event')
@@ -47,5 +47,24 @@ export class EventFormController {
       files.orgRequestLetter?.[0]?.buffer || undefined,
     );
     
+  }
+  //Final And Submit
+  @Post('finalSubmit')
+  @UseInterceptors(AnyFilesInterceptor()) // required to handle FormData
+  async finalSubmit(@Body() body: { userEmail: string; eventId: string; qrCode: string }) {
+    const { userEmail, eventId, qrCode } = body;
+    return this.eventFormService.saveQrCodeData(userEmail, Number(eventId), qrCode);
+  }
+
+  // Get Ticket
+  @Post('getTicket')
+  async getEventDataByEmail(@Body() body: { userEmail: string }) {
+    const { userEmail } = body;
+    if (!userEmail) {
+      throw new Error("Email is required to fetch event data.");
+    }
+    
+    // Call the service method to retrieve event data by email
+    return this.eventFormService.findAllSubmittedOrApprovedEventsByEmail(userEmail);
   }
 }
