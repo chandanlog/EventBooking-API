@@ -1,6 +1,6 @@
-import { Injectable } from '@nestjs/common';
+import { ConsoleLogger, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, Like } from 'typeorm';
 import { CreateEventFormDto } from './create-event.dto';
 import { Event } from './event.entity';
 
@@ -65,4 +65,54 @@ export class EventFormService {
   
       return this.eventRepository.save(existingEvent);
     }
+
+    async saveQrCodeData(userEmail: string, eventId: number, qrCode: string) {
+      const event = await this.eventRepository.findOne({
+        where: { eventId, userEmail },
+      });
+  
+      if (!event) {
+        throw new Error('Event not found');
+      }
+  
+      // Generate ticket prefix like TICKET-20250423
+      const now = new Date();
+      const yyyy = now.getFullYear();
+      const mm = String(now.getMonth() + 1).padStart(2, '0'); // month is 0-indexed
+      const dd = String(now.getDate()).padStart(2, '0');
+      const prefix = `TICKET-${yyyy}${mm}${dd}`;
+  
+      // Find how many tickets already exist for today
+      const todayTickets = await this.eventRepository.count({
+        where: {
+          ticketNo: Like(`${prefix}%`),
+        },
+      });
+  
+      const ticketNo = `${prefix}${String(todayTickets + 1).padStart(3, '0')}`;
+  
+      // Update the event
+      event.qrCode = qrCode;
+      event.status = 'submitted';
+      event.ticketNo = ticketNo;
+  
+      return await this.eventRepository.save(event);
+    }
+  
+    async findAllSubmittedOrApprovedEventsByEmail(userEmail: string): Promise<any> {
+      const query = `
+        SELECT event.userType,event.eventName,event.eventLoaction,event.eventDate,event.numSeats,event.eventId,event.status,event.ticketNo, member.*
+        FROM event
+        JOIN member ON member.userEmail = event.userEmail AND member.eventId = event.eventId
+        WHERE event.userEmail = 'test@gmail.com'
+          AND (
+            (event.userType = 'individual' AND event.status = 'submitted')
+            OR
+            (event.userType = 'organization' AND event.status = 'approve')
+          );
+      `;
+    
+      const result = await this.eventRepository.query(query, [userEmail]);
+      return result;
+    }    
 }
