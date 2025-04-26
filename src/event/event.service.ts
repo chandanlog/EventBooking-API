@@ -125,6 +125,10 @@ export class EventFormService {
       const orgPending = allEvents.find(
         (e) => e.userType === 'organization' && e.status === 'submitted'
       );
+      // Admin Rejected
+      const orgReject = allEvents.find(
+        (e) => e.userType === 'organization' && e.status === 'reject'
+      );
     
       // If organization event is pending approval, include message in the response
       if (orgPending) {
@@ -136,6 +140,18 @@ export class EventFormService {
           ),
         ];
         return response;  // Return a single array including the message and approved events
+      }
+
+       // If Admin event is reject approval, include message in the response
+      if (orgReject) {
+        const response = [
+          { message: 'We regret to inform you that your ticket has been rejected.' },
+          ...allEvents.filter(
+            (e) =>
+              !(e.userType === 'organization' && e.status === 'reject')
+          ),
+        ];
+        return response;  // Return a single array including the message 
       }
     
       // Otherwise, return valid submitted/approved events
