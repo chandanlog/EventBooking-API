@@ -31,7 +31,8 @@ export class AuthService {
     const hashedPassword = await bcrypt.hash(password, 10);
 
     // Save User
-    const newUser = this.userRepository.create({ fullName, email, password: hashedPassword });
+    const createdAt = new Date();
+    const newUser = this.userRepository.create({ fullName, email, password: hashedPassword, createdAt});
     await this.userRepository.save(newUser);
 
     return { message: "User registered successfully" };
@@ -41,20 +42,14 @@ export class AuthService {
   async login(loginDto: LoginDto): Promise<{ accessToken: string, email: string }> {
     const { email, password } = loginDto;
 
-    console.log("Received Email:", email);
-    console.log("Received Password:", password);
-
     // Find user by email
     const user = await this.userRepository.findOne({ where: { email } });
     if (!user) {
       throw new UnauthorizedException("User not found");
     }
 
-    console.log("Stored Hashed Password:", user.password);
-
     // Verify Password
     const isPasswordValid = await bcrypt.compare(password, user.password);
-    console.log("Password valid:", isPasswordValid);
 
     if (!isPasswordValid) {
       throw new UnauthorizedException("Invalid password");

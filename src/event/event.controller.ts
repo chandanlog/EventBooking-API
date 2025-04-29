@@ -67,4 +67,6 @@ export class EventFormController {
     // Call the service method to retrieve event data by email
     return this.eventFormService.findAllSubmittedOrApprovedEventsByEmail(userEmail);
   }
+
+  
 }

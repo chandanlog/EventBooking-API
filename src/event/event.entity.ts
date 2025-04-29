@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn } from 'typeorm';
 
 @Entity('event')
 export class Event {
@@ -67,5 +67,7 @@ export class Event {
   
   @Column({ type: 'text', nullable: true })
   qrCode: string;
-
+  
+  @CreateDateColumn() 
+  createdAt: Date;
 }

@@ -18,11 +18,12 @@ export class EventFormService {
       where: { userEmail, eventName },
     });
   
-    if (existingEvent && existingEvent.status !== 'submitted') {
+    if (existingEvent && existingEvent.status !== 'submitted'  && existingEvent.status !== 'approve') {
       // Update existing entry
       Object.assign(existingEvent, {
         ...createEventFormDto,
         status: 'event details', // set internally
+        createdAt: new Date(),
       });
       return await this.eventRepository.save(existingEvent);
     } else {
@@ -30,6 +31,7 @@ export class EventFormService {
       const newEvent = this.eventRepository.create({
         ...createEventFormDto,
         status: 'event details', // set internally
+        createdAt: new Date(),
       });
       return await this.eventRepository.save(newEvent);
     }
@@ -62,7 +64,7 @@ export class EventFormService {
   
       // Set status to upload document
       existingEvent.status = 'upload document';
-  
+      existingEvent.createdAt = new Date();
       return this.eventRepository.save(existingEvent);
     }
 
@@ -95,7 +97,7 @@ export class EventFormService {
       event.qrCode = qrCode;
       event.status = 'submitted';
       event.ticketNo = ticketNo;
-  
+      event.createdAt = new Date();
       return await this.eventRepository.save(event);
     }
   
@@ -116,7 +118,7 @@ export class EventFormService {
           ON member.userEmail = event.userEmail 
           AND member.eventId = event.eventId
         WHERE event.userEmail = ?
-        ORDER BY event.eventDate DESC
+        ORDER BY event.createdAt DESC
       `;
     
       const allEvents = await this.eventRepository.query(query, [userEmail]);
