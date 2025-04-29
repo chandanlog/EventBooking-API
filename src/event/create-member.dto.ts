@@ -5,11 +5,13 @@ export class CreateMemberDto {
     idType: string;
     idNumber: string;
     mobile: string;
+    createdAt: Date;
   }
   
   export class BulkCreateMembersDto {
     eventId: number;
     members: CreateMemberDto[]; 
     userEmail: string;
+    createdAt: Date;
   }
   

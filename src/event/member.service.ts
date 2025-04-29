@@ -16,6 +16,7 @@ export class MemberService {
       ...member,
       eventId,
       userEmail,
+      createdAt: new Date(),
     }));
   
     const created = this.memberRepository.create(membersWithEvent);

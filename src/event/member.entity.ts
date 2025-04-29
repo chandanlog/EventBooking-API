@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn } from 'typeorm';
 
 @Entity()
 export class Member {
@@ -28,5 +28,8 @@ export class Member {
 
   @Column()
   eventId: number;
+
+  @CreateDateColumn() 
+  createdAt: Date;
   
 }
