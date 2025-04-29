@@ -69,7 +69,4 @@ export class CreateEventFormDto {
   @IsString()
   @IsNotEmpty()
   idNumber: string;
-
-  @IsDateString()
-  createdAt: string;
 }
