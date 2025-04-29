@@ -17,7 +17,6 @@ export class AuthController {
   // Login Route
   @Post("login")
   async login(@Body() loginDto: LoginDto) {
-    console.log("🔥 Received request body:", loginDto); // Log full request
     return this.authService.login(loginDto);
   }
 }
