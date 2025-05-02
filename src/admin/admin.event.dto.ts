@@ -1,5 +1,3 @@
-// src/admin/admin.event.dto.ts
-
 import { IsString, IsNotEmpty } from 'class-validator';
 
 export class CreateEventFormDto {
