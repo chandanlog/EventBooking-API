@@ -33,7 +33,13 @@ export class EventFormController {
     return this.AdminService.updateQueryData(Number(id),Number(eventId),eventName,userEmail,status);
   }
 
-  @Put('addEvent')
+  @Put('updateEvent')
+  async getUpdateEvents(@Body() body: { eventid: string; title: string; location: string; date:string, image:string }) {
+    const { eventid, title, location, date, image } = body;
+    return this.AdminService.updateEventData(Number(eventid),title,location,date,image);
+  }
+
+  @Post('addEvent')
   async getAddEvents(@Body() body: { title: string; location: string; date:string, image:string }) {
     const { title, location, date, image } = body;
     return this.AdminService.addEventData(title,location,date,image);
