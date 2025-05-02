@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, UploadedFiles, UseInterceptors} from '@nestjs/common';
+import { Body, Controller, Get, Post, UploadedFiles, UseInterceptors, HttpException, HttpStatus} from '@nestjs/common';
 import { EventFormService } from './event.service';
 import { CreateEventFormDto } from './create-event.dto';
 import { FileFieldsInterceptor,AnyFilesInterceptor } from '@nestjs/platform-express';
@@ -10,7 +10,17 @@ export class EventFormController {
 
   @Post()
   async submitForm(@Body() formDto: CreateEventFormDto) {
-    return this.eventFormService.createOrUpdateEvent(formDto);
+    try {
+      return this.eventFormService.createOrUpdateEvent(formDto);
+    } catch (error) {
+      throw new HttpException(
+        {
+          status: HttpStatus.BAD_REQUEST,
+          error: error.message || 'An error occurred while processing your request',
+        },
+        HttpStatus.BAD_REQUEST,
+      );
+    }
   }
 
   @Get()
@@ -51,9 +61,9 @@ export class EventFormController {
   //Final And Submit
   @Post('finalSubmit')
   @UseInterceptors(AnyFilesInterceptor()) // required to handle FormData
-  async finalSubmit(@Body() body: { userEmail: string; eventId: string; qrCode: string }) {
-    const { userEmail, eventId, qrCode } = body;
-    return this.eventFormService.saveQrCodeData(userEmail, Number(eventId), qrCode);
+  async finalSubmit(@Body() body: { userEmail: string; eventId: string; qrCode: string, userType:string }) {
+    const { userEmail, eventId, qrCode, userType } = body;
+    return this.eventFormService.saveQrCodeData(userEmail, Number(eventId), qrCode, userType);
   }
 
   // Get Ticket

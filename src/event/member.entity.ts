@@ -29,6 +29,9 @@ export class Member {
   @Column()
   eventId: number;
 
+  @Column()
+  userType: string;
+  
   @CreateDateColumn() 
   createdAt: Date;
   
