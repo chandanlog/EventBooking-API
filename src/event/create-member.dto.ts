@@ -12,6 +12,7 @@ export class CreateMemberDto {
     eventId: number;
     members: CreateMemberDto[]; 
     userEmail: string;
+    userType: string;
     createdAt: Date;
   }
   

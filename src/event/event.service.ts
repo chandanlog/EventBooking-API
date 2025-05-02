@@ -1,4 +1,4 @@
-import { ConsoleLogger, Injectable } from '@nestjs/common';
+import { ConsoleLogger, Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Like } from 'typeorm';
 import { CreateEventFormDto } from './create-event.dto';
@@ -11,14 +11,21 @@ export class EventFormService {
     private eventRepository: Repository<Event>,
   ) {}
 
-  async createOrUpdateEvent(createEventFormDto: CreateEventFormDto): Promise<Event> {
+  async createOrUpdateEvent(createEventFormDto: CreateEventFormDto): Promise<Event | undefined> {
     const { userEmail, eventName} = createEventFormDto;
   
     const existingEvent = await this.eventRepository.findOne({
       where: { userEmail, eventName },
     });
   
-    if (existingEvent && existingEvent.status !== 'submitted'  && existingEvent.status !== 'approve') {
+    if (existingEvent) {
+      if (existingEvent.status === 'submitted' || existingEvent.status === 'approve') {
+        throw new HttpException(
+          'Already booked,Please check "Get Ticket" from the sidebar!',
+          HttpStatus.BAD_REQUEST
+        );
+      } 
+      else if (existingEvent && existingEvent.status !== 'submitted'  && existingEvent.status !== 'approve') {
       // Update existing entry
       Object.assign(existingEvent, {
         ...createEventFormDto,
@@ -26,6 +33,7 @@ export class EventFormService {
         createdAt: new Date(),
       });
       return await this.eventRepository.save(existingEvent);
+      }
     } else {
       // Create new entry with status
       const newEvent = this.eventRepository.create({
@@ -68,9 +76,9 @@ export class EventFormService {
       return this.eventRepository.save(existingEvent);
     }
 
-    async saveQrCodeData(userEmail: string, eventId: number, qrCode: string) {
+    async saveQrCodeData(userEmail: string, eventId: number, qrCode: string, userType: string) {
       const event = await this.eventRepository.findOne({
-        where: { eventId, userEmail },
+        where: { eventId, userEmail, userType },
       });
   
       if (!event) {
@@ -117,6 +125,7 @@ export class EventFormService {
         JOIN member 
           ON member.userEmail = event.userEmail 
           AND member.eventId = event.eventId
+          AND member.userType = event.userType
         WHERE event.userEmail = ?
         ORDER BY event.createdAt DESC
       `;
