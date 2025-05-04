@@ -22,10 +22,10 @@ export class AdminService {
 
   async findAllEventsByUserType(userType: string): Promise<any>{
     const query = `
-      SELECT id,userEmail,eventName,eventDate,eventId,numSeats,modeOfTravel,vehicleDetails,idProof,orgRequestLetter,status
+      SELECT id,organizationName,userEmail,eventName,eventDate,eventId,numSeats,modeOfTravel,vehicleDetails,idProof,orgRequestLetter,status
       FROM event
       WHERE userType = ?
-      ORDER BY event.eventDate DESC
+      ORDER BY event.createdAt DESC
     `;
 
     const allEvents = await this.eventRepository.query(query, [userType]);
