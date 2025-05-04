@@ -90,8 +90,9 @@ export class EventFormService {
       const yyyy = now.getFullYear();
       const mm = String(now.getMonth() + 1).padStart(2, '0'); // month is 0-indexed
       const dd = String(now.getDate()).padStart(2, '0');
-      const prefix = `EVE-${yyyy}${mm}${dd}${eventId}`;
-  
+      
+      const datePart = `${dd}${mm}${yyyy}`;      
+      const prefix = `EVE-${datePart}${eventId}`;
       // Find how many tickets already exist for today
       const todayTickets = await this.eventRepository.count({
         where: {
