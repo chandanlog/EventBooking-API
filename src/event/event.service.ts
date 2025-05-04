@@ -125,7 +125,7 @@ export class EventFormService {
           AND member.eventId = event.eventId
           AND member.userType = event.userType
           AND member.organizationName = event.organizationName
-        WHERE event.userEmail = ?
+        WHERE event.userEmail = ? AND (event.status IN ('submitted', 'approve', 'reject'))
         ORDER BY event.createdAt DESC
       `;
     
