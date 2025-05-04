@@ -99,7 +99,6 @@ export class EventFormService {
         },
       });
       const ticketNo = `${prefix}${String(todayTickets + 1).padStart(2, '0')}`;
-  
       // Update the event
       event.qrCode = qrCode;
       event.status = 'submitted';
