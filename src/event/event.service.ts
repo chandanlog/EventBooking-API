@@ -92,7 +92,6 @@ export class EventFormService {
       const dd = String(now.getDate()).padStart(2, '0');
       const datePart = `${dd}${mm}${yyyy}`;      
       const prefix = `EVE-${datePart}${eventId}`;
-
       const todayTickets = await this.eventRepository.count({
         where: {
           ticketNo: Like(`${prefix}%`),
