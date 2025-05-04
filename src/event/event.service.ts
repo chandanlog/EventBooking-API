@@ -21,7 +21,7 @@ export class EventFormService {
     if (existingEvent) {
       if (existingEvent.status === 'submitted' || existingEvent.status === 'approve') {
         throw new HttpException(
-          'Already booked,Please check "Get Ticket" from the sidebar!',
+          'Already booked,Please check "View Booking" from the sidebar!',
           HttpStatus.BAD_REQUEST
         );
       } 
@@ -109,7 +109,8 @@ export class EventFormService {
     async findAllSubmittedOrApprovedEventsByEmail(userEmail: string): Promise<any> {
       const query = `
         SELECT 
-          event.userType, 
+          event.userType,
+          event.organizationName,
           event.eventName, 
           event.eventLoaction, 
           event.eventDate, 
@@ -123,6 +124,7 @@ export class EventFormService {
           ON member.userEmail = event.userEmail 
           AND member.eventId = event.eventId
           AND member.userType = event.userType
+          AND member.organizationName = event.organizationName
         WHERE event.userEmail = ?
         ORDER BY event.createdAt DESC
       `;

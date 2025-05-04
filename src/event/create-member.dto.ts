@@ -13,6 +13,7 @@ export class CreateMemberDto {
     members: CreateMemberDto[]; 
     userEmail: string;
     userType: string;
+    organizationName: string;
     createdAt: Date;
   }
   

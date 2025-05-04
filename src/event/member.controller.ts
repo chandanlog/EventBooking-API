@@ -8,6 +8,6 @@ export class MemberController {
 
   @Post()
   async createBulkMembers(@Body() body: BulkCreateMembersDto) {
-    return this.memberService.createMembersWithEvent(body.eventId, body.members, body.userEmail, body.userType);
+    return this.memberService.createMembersWithEvent(body.eventId, body.members, body.userEmail, body.userType, body.organizationName);
   }
 }

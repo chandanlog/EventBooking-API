@@ -36,6 +36,10 @@ export class CreateEventFormDto {
 
   @IsString()
   @IsOptional()
+  organizationName?: string;
+
+  @IsString()
+  @IsOptional()
   modeOfTravel?: string;
 
   @IsString()
