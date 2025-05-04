@@ -30,6 +30,9 @@ export class Event {
   numSeats: number;
 
   @Column({ nullable: true })
+  organizationName: string;
+
+  @Column({ nullable: true })
   modeOfTravel: string;
 
   @Column({ nullable: true })

@@ -5,6 +5,9 @@ export class Member {
   @PrimaryGeneratedColumn()
   id: number;
  
+  @Column({ nullable: true })
+  organizationName: string;
+  
   @Column()
   userEmail: string;
 

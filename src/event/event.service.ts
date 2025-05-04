@@ -21,7 +21,7 @@ export class EventFormService {
     if (existingEvent) {
       if (existingEvent.status === 'submitted' || existingEvent.status === 'approve') {
         throw new HttpException(
-          'Already booked,Please check "Get Ticket" from the sidebar!',
+          'Already booked,Please check "View Booking" from the sidebar!',
           HttpStatus.BAD_REQUEST
         );
       } 
@@ -88,18 +88,17 @@ export class EventFormService {
       // Generate ticket prefix like TICKET-20250423
       const now = new Date();
       const yyyy = now.getFullYear();
-      const mm = String(now.getMonth() + 1).padStart(2, '0'); // month is 0-indexed
+      const mm = String(now.getMonth() + 1).padStart(2, '0');
       const dd = String(now.getDate()).padStart(2, '0');
-      const prefix = `TICKET-${yyyy}${mm}${dd}`;
-  
-      // Find how many tickets already exist for today
+      const datePart = `${yyyy}${mm}${dd}`;      
+      const prefix = `EVE-${datePart}${eventId}`;
+
       const todayTickets = await this.eventRepository.count({
         where: {
           ticketNo: Like(`${prefix}%`),
         },
       });
-  
-      const ticketNo = `${prefix}${String(todayTickets + 1).padStart(3, '0')}`;
+      const ticketNo = `${prefix}${String(todayTickets + 1).padStart(2, '0')}`;
   
       // Update the event
       event.qrCode = qrCode;
@@ -112,7 +111,8 @@ export class EventFormService {
     async findAllSubmittedOrApprovedEventsByEmail(userEmail: string): Promise<any> {
       const query = `
         SELECT 
-          event.userType, 
+          event.userType,
+          event.organizationName,
           event.eventName, 
           event.eventLoaction, 
           event.eventDate, 
@@ -126,6 +126,7 @@ export class EventFormService {
           ON member.userEmail = event.userEmail 
           AND member.eventId = event.eventId
           AND member.userType = event.userType
+          AND member.organizationName = event.organizationName
         WHERE event.userEmail = ?
         ORDER BY event.createdAt DESC
       `;

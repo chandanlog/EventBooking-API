@@ -11,12 +11,13 @@ export class MemberService {
     private memberRepository: Repository<Member>,
   ) {}
 
-  async createMembersWithEvent(eventId: number, members: CreateMemberDto[], userEmail: string, userType: string): Promise<Member[]> {
+  async createMembersWithEvent(eventId: number, members: CreateMemberDto[], userEmail: string, userType: string,organizationName: string): Promise<Member[]> {
     const membersWithEvent = members.map(member => ({
       ...member,
       eventId,
       userEmail,
       userType,
+      organizationName,
       createdAt: new Date(),
     }));
   
