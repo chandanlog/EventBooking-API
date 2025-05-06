@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Admin } from './admin.entity';
 import { CreateEventFormDto } from './admin.event.dto';
-
+  
 @Injectable()
 export class AdminService {
   constructor(
@@ -75,4 +75,71 @@ export class AdminService {
     const query = `DELETE FROM admin WHERE eventid = ?`;
     return this.eventRepository.query(query, [eventid]);
   }
+
+  async getEventReportData(){
+    const EventReportQuery = `
+    SELECT 
+    MONTHNAME(e.createdAt) AS month,
+    e.eventName AS name,
+    COUNT(m.id) AS attendees,
+    e.userType AS userType,
+    e.state,
+    e.modeOfTravel AS vehicleType
+    FROM event e
+    LEFT JOIN member m ON e.eventId = m.eventId
+    WHERE e.createdAt <= NOW()
+    GROUP BY MONTHNAME(e.createdAt), e.eventName, e.userType, e.state, e.modeOfTravel
+    `;
+    const addEvent = await this.eventRepository.query(EventReportQuery);
+    return addEvent;
+  }
+  async getFilteredReportData(event:string, year:string, month:string, userType:string){
+    let query = `
+      SELECT 
+        event.userType,
+        event.organizationName,
+        event.eventName, 
+        event.eventLoaction, 
+        event.eventDate, 
+        event.numSeats, 
+        event.eventId, 
+        event.status, 
+        event.ticketNo, 
+        member.*
+      FROM event
+      JOIN member 
+        ON member.userEmail = event.userEmail 
+        AND member.eventId = event.eventId
+        AND member.userType = event.userType
+        AND member.organizationName = event.organizationName
+      WHERE event.status IN ('submitted', 'approve', 'reject')
+     
+    `;
+    const params: any[] = [];
+    if (event) {
+      query += ` AND event.eventName = ?`;
+      params.push(event);
+    }
+
+    if (year) {
+      query += ` AND YEAR(event.createdAt) = ?`;
+      params.push(year);
+    }
+
+    if (month) {
+      query += ` AND MONTH(event.createdAt) = ?`;
+      params.push(month);
+    }
+
+    if (userType) {
+      query += ` AND event.userType = ?`;
+      params.push(userType);
+    }
+
+    query += ` ORDER BY event.createdAt DESC`;
+
+    const filteredEvents = await this.eventRepository.query(query, params);
+    return filteredEvents;
+  }
+  
 }

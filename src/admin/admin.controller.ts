@@ -1,6 +1,7 @@
-import { Body, Controller, Get, Post, Put, Delete, Param, HttpException, HttpStatus} from '@nestjs/common';
+import { Body, Controller, Get, Post, Put, Delete, Param, HttpException, HttpStatus, Query} from '@nestjs/common';
 import { AdminService } from './admin.service';
 import { CreateEventFormDto } from './admin.event.dto';
+import { get } from 'http';
 
 @Controller('admin')
 export class EventFormController {
@@ -53,4 +54,19 @@ export class EventFormController {
     return this.AdminService.deleteEvent(Number(eventid));
   }
 
+  @Get('getEventReport')
+  async getReport() {
+    return await this.AdminService.getEventReportData();
+  }
+
+  @Get('filteredData')
+  async getFilteredReport(
+    @Query('event') event: string,
+    @Query('year') year: string,
+    @Query('month') month: string,
+    @Query('userType') userType: string,
+  ) {
+    // Pass query params to service
+    return await this.AdminService.getFilteredReportData(event, year, month, userType);
+  }
 }
