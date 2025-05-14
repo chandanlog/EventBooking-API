@@ -2,10 +2,16 @@ import { Body, Controller, Get, Post, Put, Delete, Param, HttpException, HttpSta
 import { AdminService } from './admin.service';
 import { CreateEventFormDto } from './admin.event.dto';
 import { get } from 'http';
+import { join } from 'path';
+import * as fs from 'fs';
+import { DistrictsData } from '../interfaces/district.interface';
 
 @Controller('admin')
 export class EventFormController {
   constructor(private readonly AdminService: AdminService) {}
+   private districts: DistrictsData = JSON.parse(
+    fs.readFileSync(join(__dirname, '../../data/statesDistricts.json'), 'utf-8'),
+  ) as DistrictsData;
 
   @Post()
   async createEvent(@Body() createEventDto: CreateEventFormDto) {
@@ -68,5 +74,30 @@ export class EventFormController {
   ) {
     // Pass query params to service
     return await this.AdminService.getFilteredReportData(event, year, month, userType);
+  }
+
+  // ✅ GET all unique state names
+  @Get('location/states')
+  getStates() {
+    const statesSet = new Set<string>();
+    this.districts.districts.forEach((item) => {
+      statesSet.add(item.state);
+    });
+
+    return Array.from(statesSet);
+  }
+
+  // ✅ GET all district names by state name
+  @Get('location/districts/:stateName')
+  getDistrictsByState(@Param('stateName') stateName: string) {
+    const districts = this.districts.districts.filter(
+      (d) => d.state.toLowerCase() === stateName.toLowerCase(),
+    );
+
+    if (districts.length === 0) {
+      throw new HttpException('State not found', HttpStatus.NOT_FOUND);
+    }
+
+    return districts.map((d) => d.district);
   }
 }
