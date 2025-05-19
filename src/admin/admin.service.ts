@@ -78,17 +78,24 @@ export class AdminService {
 
   async getEventReportData(){
     const EventReportQuery = `
-    SELECT 
-    MONTHNAME(e.createdAt) AS month,
-    e.eventName AS name,
-    COUNT(m.id) AS attendees,
-    e.userType AS userType,
-    e.state,
-    e.modeOfTravel AS vehicleType
+        SELECT 
+        MONTHNAME(e.createdAt) AS month,
+        e.eventName AS name,
+        COUNT(m.id) AS attendees,
+        e.userType AS userType,
+        e.state,
+        e.modeOfTravel AS vehicleType
     FROM event e
     LEFT JOIN member m ON e.eventId = m.eventId
     WHERE e.createdAt <= NOW()
-    GROUP BY MONTHNAME(e.createdAt), e.eventName, e.userType, e.state, e.modeOfTravel
+    GROUP BY 
+        MONTH(e.createdAt),
+        MONTHNAME(e.createdAt),
+        e.eventName,
+        e.userType,
+        e.state,
+        e.modeOfTravel
+    ORDER BY month(e.createdAt)
     `;
     const addEvent = await this.eventRepository.query(EventReportQuery);
     return addEvent;
