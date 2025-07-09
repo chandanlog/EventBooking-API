@@ -2,7 +2,7 @@ import { User } from './../users/user.entity';
 import { Controller, Post, Body, UseGuards, Request } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LocalAuthGuard } from './guards/local-auth.guard';
-import { RegisterDto, LoginDto } from './dto/auth.dto'; // 👈 Import both RegisterDto and LoginDto
+import { RegisterDto, LoginDto, UserDto } from './dto/auth.dto'; // 👈 Import both RegisterDto and LoginDto
 
 @Controller('auth')
 export class AuthController {
@@ -18,5 +18,10 @@ export class AuthController {
   @Post("login")
   async login(@Body() loginDto: LoginDto) {
     return this.authService.login(loginDto);
+  }
+
+  @Post("storeUser")
+  async storeUser(@Body() userDto: UserDto) {
+    return this.authService.storeUser(userDto);
   }
 }

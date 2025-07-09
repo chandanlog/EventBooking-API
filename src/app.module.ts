@@ -44,6 +44,7 @@ import { MemberModule } from './event/member.module';
 import { AdminModule } from './admin/admin.module';
 import { AdminUserModule } from './admin-login/admin-login.module';
 import { AdminUser } from './admin-login/entities/admin-login.entity';
+import { FirebaseUser } from './users/firebase-user.entity';
 
 @Module({
   imports: [
@@ -56,7 +57,7 @@ import { AdminUser } from './admin-login/entities/admin-login.entity';
       username: process.env.DB_USER,
       password: process.env.DB_PASS,
       database: process.env.DB_NAME,
-      entities: [User, Event, Member, Admin, AdminUser],
+      entities: [User,FirebaseUser, Event, Member, Admin, AdminUser],
       synchronize: process.env.NODE_ENV !== 'production', // safer in dev
       extra: {
         connectionLimit: 10,           // Controls how many connections in the pool
