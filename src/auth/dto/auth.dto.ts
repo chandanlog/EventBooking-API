@@ -1,4 +1,4 @@
-import { IsEmail, IsNotEmpty, MinLength } from "class-validator";
+import { IsArray, IsEmail, IsNotEmpty, IsString, MinLength } from "class-validator";
 
 export class RegisterDto {
   @IsNotEmpty()
@@ -17,4 +17,29 @@ export class LoginDto {
 
   @MinLength(6)
   password: string;
+}
+
+// 🔹 For Google/Firebase Login
+export class UserDto {
+  @IsEmail()
+  identifier: string;
+
+  @IsArray()
+  @IsString({ each: true })
+  providers: string[];
+
+  @IsString()
+  created: string; // YYYY-MM-DD
+
+  @IsString()
+  signedIn: string;
+
+  @IsString()
+  userUID: string;
+
+  @IsString()
+  userName: string;
+
+  @IsString()
+  photoURL: string;
 }

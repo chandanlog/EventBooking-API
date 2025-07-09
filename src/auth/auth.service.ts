@@ -4,7 +4,8 @@ import { Repository } from "typeorm";
 import * as bcrypt from "bcrypt";
 import { JwtService } from "@nestjs/jwt";
 import { User } from "../users/user.entity";
-import { RegisterDto, LoginDto } from "./dto/auth.dto";
+import { FirebaseUser } from "../users/firebase-user.entity";
+import { RegisterDto, LoginDto, UserDto } from "./dto/auth.dto";
 import * as jwt from 'jsonwebtoken';
 import e from "express";
 
@@ -14,6 +15,10 @@ export class AuthService {
   constructor(
     @InjectRepository(User)
     private userRepository: Repository<User>,
+
+    @InjectRepository(FirebaseUser)
+    private firebaseUserRepository: Repository<FirebaseUser>,
+
     private jwtService: JwtService
   ) {}
 
@@ -87,4 +92,42 @@ export class AuthService {
       throw new Error('Failed to decode token: ' + error.message);
     }
   }
+
+  // ✅ Store Google User (Firebase login)
+  async storeUser(userDto: UserDto) {
+  const {
+    identifier,
+    providers,
+    created,
+    signedIn,
+    userUID,
+    userName,
+    photoURL,
+  } = userDto;
+
+  const existing = await this.firebaseUserRepository.findOne({
+    where: { userUID },
+  });
+
+  if (existing) {
+    existing.signedIn = signedIn;
+    existing.providers = providers.join(',');
+    existing.photoURL = photoURL;
+    await this.firebaseUserRepository.save(existing);
+    return { message: 'Firebase user updated' };
+  }
+
+  const newUser = this.firebaseUserRepository.create({
+    identifier,
+    providers: providers.join(','),
+    created,
+    signedIn,
+    userUID,
+    userName,
+    photoURL,
+  });
+
+  await this.firebaseUserRepository.save(newUser);
+  return { message: 'Firebase user saved successfully' };
+}
 }

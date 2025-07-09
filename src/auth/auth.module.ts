@@ -8,10 +8,11 @@ import { JwtModule } from '@nestjs/jwt';  // Import JwtModule for JWT functional
 import { PassportModule } from '@nestjs/passport';  // Import PassportModule to enable Passport.js strategies
 import { JwtStrategy } from './strategies/jwt.strategy';  // Import JwtStrategy for JWT-based authentication
 import { LocalStrategy } from './strategies/local.strategy';  // Import LocalStrategy for email/password authentication
+import { FirebaseUser } from 'src/users/firebase-user.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([User]),  // Integrate User entity with TypeORM for database operations
+    TypeOrmModule.forFeature([User,FirebaseUser]),  // Integrate User entity with TypeORM for database operations
     UserModule,  // Import UserModule to manage user-related services
     PassportModule,  // Enable Passport strategies for authentication
     JwtModule.register({
